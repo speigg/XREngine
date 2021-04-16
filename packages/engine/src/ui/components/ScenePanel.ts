@@ -1,9 +1,10 @@
 import { Block, Text } from "../../assets/three-mesh-ui";
 import { Object3D, Color, } from "three";
 import SceneButton from "../components/SceneButton";
+import VideoElement from './VideoElement';
 
 class ScenePanel extends Object3D {
-  container: Block;
+  container: Object3D;
   siblings: [];
 
   constructor(title, description, image) {
@@ -14,12 +15,9 @@ class ScenePanel extends Object3D {
 
   init(title, description) {
     this.siblings = [];
-    this.container = new Block({
-      width: 1,
-      height: 0.5
-    });
 
-    this.container.position.set(0, 0, 0);
+    const url = "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4";
+    this.container = new VideoElement(1, 0.5, 0, 0, url);
     this.add(this.container);
 
     const textBlock = new Block({
@@ -97,7 +95,7 @@ class ScenePanel extends Object3D {
     // this.container.height = 1;
     this.needsUpdate = true;
 
-    this.container.set({ width: 3, height: 1.5 });
+    this.container.resize({ width: 3, height: 1.5 });
 
     console.log('before position : ', this.oldPosX, this.oldPosY, this.oldPosZ);
 
@@ -116,7 +114,7 @@ class ScenePanel extends Object3D {
       element.needsUpdate = true;
     });
 
-    this.container.set({ width: 1, height: 0.5 });
+    this.container.resize({ width: 1, height: 0.5 });
     this.position.set(this.oldPosX, this.oldPosY, this.oldPosZ);
     console.log('back position : ', this.oldPosX, this.oldPosY, this.oldPosZ);
 
