@@ -1,5 +1,6 @@
 import { Block, Text } from "../../assets/three-mesh-ui";
-import { Object3D, Color, VideoTexture } from "three";
+import { Object3D, Color, VideoTexture, TextureLoader, Texture, ClampToEdgeWrapping, RepeatWrapping, LinearFilter, RGBFormat, RGBAFormat } from "three";
+import {MeshBasicMaterial, FrontSide, PlaneGeometry, Mesh} from 'three';
 
 class SceneOverview extends Object3D {
   constructor(title, description, image) {
@@ -17,20 +18,52 @@ class SceneOverview extends Object3D {
     container.position.set(0.1, 1.35, 0);
     this.add(container);
 
+    const tag = document.getElementById('video360');
 
-
-    const video = document.getElementById('video360') as HTMLVideoElement;
-
-    console.log('video360', video);
-    // video.play();
-    // video.addEventListener( 'play', function () {
-
-    // } );
+    let video = document.createElement( 'video' );
+    video.setAttribute('crossorigin', 'anonymous');
+    video.style.display = 'none';
+    tag.append( video );
+    video.loop = "loop";
+    video.src = "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4";
+    video.muted = true;
+    video.volume = 0.5;
+    video.autoplay = true;
 
     const texture = new VideoTexture(video);
+    // texture.minFilter = LinearFilter;
+    // texture.magFilter = LinearFilter;
 
-    console.log('texture', texture);
-    // container.set({backgroundTexture: texture});
+    texture.wrapS = texture.wrapT = ClampToEdgeWrapping;
+    texture.offset.set( 0, 0 );
+    texture.repeat.set( 1, 1 );
+
+    // texture.format = RGBAFormat;
+
+    const videoMaterial =  new MeshBasicMaterial( {map: texture, side: FrontSide, toneMapped: false} );
+    const screen = new PlaneGeometry(3, 1, 32);
+    const videoScreen = new Mesh(screen, videoMaterial);
+    videoScreen.position.set(0, 0, 0.3);
+    super.add(videoScreen);
+
+    const loader = new TextureLoader();
+    loader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', (texture) => {
+      // container.set({backgroundTexture: texture});
+    });
+  
+    container.set({backgroundTexture: texture});
+
+    video.addEventListener( 'canplaythrough', function () {
+      var promise = video.play();
+      if (promise !== undefined) {
+        promise.then(_ => {
+        }).catch(error => {
+        });
+      }
+    } );
+
+    video.addEventListener( 'play', function () {
+    } );
 
     const textBlock = new Block({
       height: 0.1,
